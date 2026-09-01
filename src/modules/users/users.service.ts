@@ -2,10 +2,10 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
+import { User } from '@app/common/entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -66,7 +66,5 @@ export class UsersService {
     await this.usersRepository.softRemove(user);
   }
 
-  async setHashedRefreshToken(userId: string, hashedRefreshToken: string | null): Promise<void> {
-    await this.usersRepository.update(userId, { hashedRefreshToken });
-  }
+ 
 }

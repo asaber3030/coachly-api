@@ -1,0 +1,14 @@
+import { Subscription } from 'rxjs';
+import { Admin } from 'typeorm';
+import { BodyMeasurement } from './body-measurement.entity';
+import { CoachClient } from './coach-client.entity';
+import { Invitation } from './invitation.entity';
+import { Progress } from './progress.entity';
+import { UserProfile } from './user-profile.entity';
+import { User } from './user.entity';
+import { WorkoutExercise } from './workout-excecies.entity';
+import { DietItem } from './diet-item.entity';
+import { WorkoutGroup } from './workout-group.entity';
+import { ExerciseGroup } from './execrsie-group.entity';
+import { ProgressPhoto } from './progress-photo.entity';
+export declare const ENTITIES: (typeof Invitation | typeof User | typeof UserProfile | typeof Subscription | typeof BodyMeasurement | typeof CoachClient | typeof DietItem | typeof ExerciseGroup | typeof Progress | typeof WorkoutGroup | typeof WorkoutExercise | typeof ProgressPhoto | typeof Admin)[];

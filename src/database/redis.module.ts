@@ -12,7 +12,6 @@ import { REDIS_CLIENT } from './redis.constants';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const password = config.get<string>('redis.password');
-
         return new Redis({
           host: config.get<string>('redis.host'),
           port: config.get<number>('redis.port'),

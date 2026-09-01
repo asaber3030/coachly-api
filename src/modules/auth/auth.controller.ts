@@ -1,44 +1,34 @@
-import { Body, ClassSerializerInterceptor, Controller, HttpCode, HttpStatus, Post, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { Public } from '../../common/decorators/public.decorator';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { RefreshTokenGuard } from '../../common/guards/refresh-token.guard';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { UpdateAuthDto } from './dto/update-auth.dto';
 
-@ApiTags('auth')
-@UseInterceptors(ClassSerializerInterceptor)
-@Controller({ path: 'auth', version: '1' })
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
-  @Post('register')
-  register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+  @Post()
+  create(@Body() createAuthDto: CreateAuthDto) {
+    return this.authService.create(createAuthDto);
   }
 
-  @Public()
-  @HttpCode(HttpStatus.OK)
-  @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  @Get()
+  findAll() {
+    return this.authService.findAll();
   }
 
-  @Public()
-  @ApiBearerAuth()
-  @UseGuards(RefreshTokenGuard)
-  @HttpCode(HttpStatus.OK)
-  @Post('refresh')
-  refresh(@CurrentUser('id') userId: string) {
-    return this.authService.refreshTokens(userId);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.authService.findOne(+id);
   }
 
-  @ApiBearerAuth()
-  @HttpCode(HttpStatus.OK)
-  @Post('logout')
-  logout(@CurrentUser('id') userId: string) {
-    return this.authService.logout(userId);
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
+    return this.authService.update(+id, updateAuthDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.authService.remove(+id);
   }
 }

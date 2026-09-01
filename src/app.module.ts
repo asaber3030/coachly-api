@@ -3,13 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import configuration from './config/configuration';
-import { validationSchema } from './config/validation.schema';
 import { DatabaseModule } from './database/database.module';
 import { MongoDbModule } from './database/mongodb.module';
 import { RedisModule } from './database/redis.module';
-import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { validationSchema } from './common/schemas/env.schema';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -34,12 +34,11 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     }),
 
     DatabaseModule,
-  MongoDbModule,
-  RedisModule,
+    //MongoDbModule,
+    //RedisModule,
 
-    // Feature modules — add new ones here as the project grows
-    AuthModule,
     UsersModule,
+    AuthModule,
   ],
   providers: [
     // Rate limiting on every route by default

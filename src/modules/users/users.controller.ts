@@ -18,7 +18,7 @@ import { PaginationDto } from '../../common/dto/pagination.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles, Role } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { User } from './entities/user.entity';
+import { User } from '@app/common/entities/user.entity';
 
 @ApiTags('users')
 @ApiBearerAuth()
