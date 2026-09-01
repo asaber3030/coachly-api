@@ -13,10 +13,19 @@ const core_1 = require("@nestjs/core");
 const throttler_1 = require("@nestjs/throttler");
 const configuration_1 = require("./config/configuration");
 const database_module_1 = require("./database/database.module");
-const users_module_1 = require("./modules/users/users.module");
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const env_schema_1 = require("./common/schemas/env.schema");
 const auth_module_1 = require("./modules/auth/auth.module");
+const body_measurements_module_1 = require("./modules/measurements/body-measurements.module");
+const coach_module_1 = require("./modules/coach/coach.module");
+const diets_module_1 = require("./modules/diets/diets.module");
+const exercises_module_1 = require("./modules/exercises/exercises.module");
+const meals_module_1 = require("./modules/meals/meals.module");
+const progress_module_1 = require("./modules/progress/progress.module");
+const progress_photos_module_1 = require("./modules/progress-photos/progress-photos.module");
+const recipes_module_1 = require("./modules/recipes/recipes.module");
+const users_module_1 = require("./modules/users/users.module");
+const workouts_module_1 = require("./modules/workouts/workouts.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -40,8 +49,17 @@ exports.AppModule = AppModule = __decorate([
                 }),
             }),
             database_module_1.DatabaseModule,
-            users_module_1.UsersModule,
             auth_module_1.AuthModule,
+            users_module_1.UsersModule,
+            coach_module_1.CoachModule,
+            exercises_module_1.ExercisesModule,
+            workouts_module_1.WorkoutsModule,
+            recipes_module_1.RecipesModule,
+            meals_module_1.MealsModule,
+            diets_module_1.DietsModule,
+            progress_module_1.ProgressModule,
+            body_measurements_module_1.BodyMeasurementsModule,
+            progress_photos_module_1.ProgressPhotosModule,
         ],
         providers: [
             { provide: core_1.APP_GUARD, useClass: throttler_1.ThrottlerGuard },

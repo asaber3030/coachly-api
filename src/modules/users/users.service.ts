@@ -1,70 +1,108 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
+import { CoachClient } from '@app/common/entities/coach-client.entity';
 import { User } from '@app/common/entities/user.entity';
+import { UserProfile } from '@app/common/entities/user-profile.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectRepository(UserProfile)
+    private readonly profilesRepository: Repository<UserProfile>,
+    @InjectRepository(CoachClient)
+    private readonly coachClientsRepository: Repository<CoachClient>,
   ) {}
 
-  async create(dto: CreateUserDto): Promise<User> {
-    const existing = await this.usersRepository.findOne({ where: { email: dto.email } });
-    if (existing) {
-      throw new ConflictException('Email is already in use');
-    }
-
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const user = this.usersRepository.create({ ...dto, password: hashedPassword });
-    return this.usersRepository.save(user);
-  }
-
-  async findAll(pagination: PaginationDto): Promise<PaginatedResult<User>> {
-    const [data, total] = await this.usersRepository.findAndCount({
-      skip: pagination.skip,
-      take: pagination.limit,
-      order: { createdAt: 'DESC' },
+  async getMe(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['profile'],
     });
 
-    return {
-      data,
-      meta: {
-        page: pagination.page,
-        limit: pagination.limit,
-        total,
-        totalPages: Math.ceil(total / pagination.limit),
-      },
-    };
-  }
-
-  async findOne(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundException('User not found');
     }
+
     return user;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { email } });
-  }
+  async updateMe(userId: string, dto: UpdateUserDto): Promise<User> {
+    const user = await this.getMe(userId);
 
-  async update(id: string, dto: UpdateUserDto): Promise<User> {
-    const user = await this.findOne(id);
-    Object.assign(user, dto);
+    Object.assign(user, {
+      firstName: dto.firstName ?? user.firstName,
+      lastName: dto.lastName ?? user.lastName,
+    });
+
     return this.usersRepository.save(user);
   }
 
-  async remove(id: string): Promise<void> {
-    const user = await this.findOne(id);
-    await this.usersRepository.softRemove(user);
+  async getProfile(userId: string): Promise<UserProfile> {
+    const user = await this.getMe(userId);
+
+    if (!user.profile) {
+      const profile = this.profilesRepository.create({ user });
+      return this.profilesRepository.save(profile);
+    }
+
+    return user.profile;
   }
 
- 
+  async updateProfile(userId: string, dto: UpdateUserProfileDto): Promise<UserProfile> {
+    const user = await this.getMe(userId);
+    const profile = user.profile ?? this.profilesRepository.create({ user });
+
+    Object.assign(profile, {
+      phone: dto.phone ?? profile.phone,
+      height: dto.height ?? profile.height,
+      birthDate: dto.birthDate ? new Date(dto.birthDate) : profile.birthDate,
+      gender: dto.gender ?? profile.gender,
+      avatar: dto.avatar ?? profile.avatar,
+      goal: dto.goal ?? profile.goal,
+    });
+
+    if (!user.profile) {
+      user.profile = profile;
+      await this.usersRepository.save(user);
+    }
+
+    return this.profilesRepository.save(profile);
+  }
+
+  async getCoach(userId: string): Promise<User | null> {
+    const coachingLink = await this.coachClientsRepository.findOne({
+      where: { client: { id: userId }, isActive: true },
+      relations: ['coach', 'coach.profile'],
+    });
+
+    return coachingLink?.coach ?? null;
+  }
+
+  async getClients(userId: string): Promise<User[]> {
+    const links = await this.coachClientsRepository.find({
+      where: { coach: { id: userId }, isActive: true },
+      relations: ['client', 'client.profile'],
+      order: { startedAt: 'DESC' },
+    });
+
+    return links.map((link) => link.client);
+  }
+
+  async getUserById(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['profile'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
 }

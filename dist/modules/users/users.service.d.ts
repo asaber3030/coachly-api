@@ -1,15 +1,19 @@
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
+import { CoachClient } from '@app/common/entities/coach-client.entity';
 import { User } from '@app/common/entities/user.entity';
+import { UserProfile } from '@app/common/entities/user-profile.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 export declare class UsersService {
     private readonly usersRepository;
-    constructor(usersRepository: Repository<User>);
-    create(dto: CreateUserDto): Promise<User>;
-    findAll(pagination: PaginationDto): Promise<PaginatedResult<User>>;
-    findOne(id: string): Promise<User>;
-    findByEmail(email: string): Promise<User | null>;
-    update(id: string, dto: UpdateUserDto): Promise<User>;
-    remove(id: string): Promise<void>;
+    private readonly profilesRepository;
+    private readonly coachClientsRepository;
+    constructor(usersRepository: Repository<User>, profilesRepository: Repository<UserProfile>, coachClientsRepository: Repository<CoachClient>);
+    getMe(userId: string): Promise<User>;
+    updateMe(userId: string, dto: UpdateUserDto): Promise<User>;
+    getProfile(userId: string): Promise<UserProfile>;
+    updateProfile(userId: string, dto: UpdateUserProfileDto): Promise<UserProfile>;
+    getCoach(userId: string): Promise<User | null>;
+    getClients(userId: string): Promise<User[]>;
+    getUserById(userId: string): Promise<User>;
 }

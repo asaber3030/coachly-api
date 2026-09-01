@@ -3,10 +3,6 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
-/**
- * Applied globally in AppModule, so every route requires a valid JWT by default.
- * Opt individual routes out with @Public().
- */
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {
@@ -18,6 +14,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getHandler(),
       context.getClass(),
     ]);
+    console.log('isPublic:', isPublic, context.getClass().name, context.getHandler().name);
     if (isPublic) {
       return true;
     }

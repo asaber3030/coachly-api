@@ -6,10 +6,19 @@ import configuration from './config/configuration';
 import { DatabaseModule } from './database/database.module';
 import { MongoDbModule } from './database/mongodb.module';
 import { RedisModule } from './database/redis.module';
-import { UsersModule } from './modules/users/users.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { validationSchema } from './common/schemas/env.schema';
 import { AuthModule } from './modules/auth/auth.module';
+import { BodyMeasurementsModule } from './modules/measurements/body-measurements.module';
+import { CoachModule } from './modules/coach/coach.module';
+import { DietsModule } from './modules/diets/diets.module';
+import { ExercisesModule } from './modules/exercises/exercises.module';
+import { MealsModule } from './modules/meals/meals.module';
+import { ProgressModule } from './modules/progress/progress.module';
+import { ProgressPhotosModule } from './modules/progress-photos/progress-photos.module';
+import { RecipesModule } from './modules/recipes/recipes.module';
+import { UsersModule } from './modules/users/users.module';
+import { WorkoutsModule } from './modules/workouts/workouts.module';
 
 @Module({
   imports: [
@@ -37,8 +46,17 @@ import { AuthModule } from './modules/auth/auth.module';
     //MongoDbModule,
     //RedisModule,
 
-    UsersModule,
     AuthModule,
+    UsersModule,
+    CoachModule,
+    ExercisesModule,
+    WorkoutsModule,
+    RecipesModule,
+    MealsModule,
+    DietsModule,
+    ProgressModule,
+    BodyMeasurementsModule,
+    ProgressPhotosModule,
   ],
   providers: [
     // Rate limiting on every route by default

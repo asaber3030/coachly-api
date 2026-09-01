@@ -15,32 +15,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
-const swagger_1 = require("@nestjs/swagger");
-const users_service_1 = require("./users.service");
-const update_user_dto_1 = require("./dto/update-user.dto");
-const pagination_dto_1 = require("../../common/dto/pagination.dto");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
-const roles_decorator_1 = require("../../common/decorators/roles.decorator");
 const roles_guard_1 = require("../../common/guards/roles.guard");
-const user_entity_1 = require("../../common/entities/user.entity");
+const update_user_dto_1 = require("./dto/update-user.dto");
+const update_user_profile_dto_1 = require("./dto/update-user-profile.dto");
+const users_service_1 = require("./users.service");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
     }
+    getMe(user) {
+        return this.usersService.getMe(user.id);
+    }
+    updateMe(user, dto) {
+        return this.usersService.updateMe(user.id, dto);
+    }
     getProfile(user) {
-        return this.usersService.findOne(user.id);
+        return this.usersService.getProfile(user.id);
     }
-    findAll(pagination) {
-        return this.usersService.findAll(pagination);
+    updateProfile(user, dto) {
+        return this.usersService.updateProfile(user.id, dto);
     }
-    findOne(id) {
-        return this.usersService.findOne(id);
+    getCoach(user) {
+        return this.usersService.getCoach(user.id);
     }
-    update(id, dto) {
-        return this.usersService.update(id, dto);
+    getClients(user) {
+        return this.usersService.getClients(user.id);
     }
-    remove(id) {
-        return this.usersService.remove(id);
+    getUserById(id) {
+        return this.usersService.getUserById(id);
     }
 };
 exports.UsersController = UsersController;
@@ -49,53 +52,62 @@ __decorate([
     openapi.ApiResponse({ status: 200, type: require("../../common/entities/user.entity").User }),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_entity_1.User]),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getMe", null);
+__decorate([
+    (0, common_1.Patch)('me'),
+    openapi.ApiResponse({ status: 200, type: require("../../common/entities/user.entity").User }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_user_dto_1.UpdateUserDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updateMe", null);
+__decorate([
+    (0, common_1.Get)('me/profile'),
+    openapi.ApiResponse({ status: 200, type: require("../../common/entities/user-profile.entity").UserProfile }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "getProfile", null);
 __decorate([
-    (0, common_1.Get)(),
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)(roles_decorator_1.Role.ADMIN),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [pagination_dto_1.PaginationDto]),
-    __metadata("design:returntype", void 0)
-], UsersController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)(roles_decorator_1.Role.ADMIN),
-    openapi.ApiResponse({ status: 200, type: require("../../common/entities/user.entity").User }),
-    __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], UsersController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    openapi.ApiResponse({ status: 200, type: require("../../common/entities/user.entity").User }),
-    __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
+    (0, common_1.Patch)('me/profile'),
+    openapi.ApiResponse({ status: 200, type: require("../../common/entities/user-profile.entity").UserProfile }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto]),
+    __metadata("design:paramtypes", [Object, update_user_profile_dto_1.UpdateUserProfileDto]),
     __metadata("design:returntype", void 0)
-], UsersController.prototype, "update", null);
+], UsersController.prototype, "updateProfile", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)(roles_decorator_1.Role.ADMIN),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
+    (0, common_1.Get)('me/coach'),
+    openapi.ApiResponse({ status: 200, type: Object }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getCoach", null);
+__decorate([
+    (0, common_1.Get)('me/clients'),
+    openapi.ApiResponse({ status: 200, type: [require("../../common/entities/user.entity").User] }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getClients", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    openapi.ApiResponse({ status: 200, type: require("../../common/entities/user.entity").User }),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], UsersController.prototype, "remove", null);
+], UsersController.prototype, "getUserById", null);
 exports.UsersController = UsersController = __decorate([
-    (0, swagger_1.ApiTags)('users'),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.UseInterceptors)(common_1.ClassSerializerInterceptor),
-    (0, common_1.Controller)({ path: 'users', version: '1' }),
+    (0, common_1.Controller)('users'),
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map

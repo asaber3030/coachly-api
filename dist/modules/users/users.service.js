@@ -16,61 +16,92 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const bcrypt = require("bcrypt");
+const coach_client_entity_1 = require("../../common/entities/coach-client.entity");
 const user_entity_1 = require("../../common/entities/user.entity");
+const user_profile_entity_1 = require("../../common/entities/user-profile.entity");
 let UsersService = class UsersService {
-    constructor(usersRepository) {
+    constructor(usersRepository, profilesRepository, coachClientsRepository) {
         this.usersRepository = usersRepository;
+        this.profilesRepository = profilesRepository;
+        this.coachClientsRepository = coachClientsRepository;
     }
-    async create(dto) {
-        const existing = await this.usersRepository.findOne({ where: { email: dto.email } });
-        if (existing) {
-            throw new common_1.ConflictException('Email is already in use');
-        }
-        const hashedPassword = await bcrypt.hash(dto.password, 10);
-        const user = this.usersRepository.create({ ...dto, password: hashedPassword });
-        return this.usersRepository.save(user);
-    }
-    async findAll(pagination) {
-        const [data, total] = await this.usersRepository.findAndCount({
-            skip: pagination.skip,
-            take: pagination.limit,
-            order: { createdAt: 'DESC' },
+    async getMe(userId) {
+        const user = await this.usersRepository.findOne({
+            where: { id: userId },
+            relations: ['profile'],
         });
-        return {
-            data,
-            meta: {
-                page: pagination.page,
-                limit: pagination.limit,
-                total,
-                totalPages: Math.ceil(total / pagination.limit),
-            },
-        };
-    }
-    async findOne(id) {
-        const user = await this.usersRepository.findOne({ where: { id } });
         if (!user) {
-            throw new common_1.NotFoundException(`User with id ${id} not found`);
+            throw new common_1.NotFoundException('User not found');
         }
         return user;
     }
-    async findByEmail(email) {
-        return this.usersRepository.findOne({ where: { email } });
-    }
-    async update(id, dto) {
-        const user = await this.findOne(id);
-        Object.assign(user, dto);
+    async updateMe(userId, dto) {
+        const user = await this.getMe(userId);
+        Object.assign(user, {
+            firstName: dto.firstName ?? user.firstName,
+            lastName: dto.lastName ?? user.lastName,
+        });
         return this.usersRepository.save(user);
     }
-    async remove(id) {
-        const user = await this.findOne(id);
-        await this.usersRepository.softRemove(user);
+    async getProfile(userId) {
+        const user = await this.getMe(userId);
+        if (!user.profile) {
+            const profile = this.profilesRepository.create({ user });
+            return this.profilesRepository.save(profile);
+        }
+        return user.profile;
+    }
+    async updateProfile(userId, dto) {
+        const user = await this.getMe(userId);
+        const profile = user.profile ?? this.profilesRepository.create({ user });
+        Object.assign(profile, {
+            phone: dto.phone ?? profile.phone,
+            height: dto.height ?? profile.height,
+            birthDate: dto.birthDate ? new Date(dto.birthDate) : profile.birthDate,
+            gender: dto.gender ?? profile.gender,
+            avatar: dto.avatar ?? profile.avatar,
+            goal: dto.goal ?? profile.goal,
+        });
+        if (!user.profile) {
+            user.profile = profile;
+            await this.usersRepository.save(user);
+        }
+        return this.profilesRepository.save(profile);
+    }
+    async getCoach(userId) {
+        const coachingLink = await this.coachClientsRepository.findOne({
+            where: { client: { id: userId }, isActive: true },
+            relations: ['coach', 'coach.profile'],
+        });
+        return coachingLink?.coach ?? null;
+    }
+    async getClients(userId) {
+        const links = await this.coachClientsRepository.find({
+            where: { coach: { id: userId }, isActive: true },
+            relations: ['client', 'client.profile'],
+            order: { startedAt: 'DESC' },
+        });
+        return links.map((link) => link.client);
+    }
+    async getUserById(userId) {
+        const user = await this.usersRepository.findOne({
+            where: { id: userId },
+            relations: ['profile'],
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return user;
     }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(user_profile_entity_1.UserProfile)),
+    __param(2, (0, typeorm_1.InjectRepository)(coach_client_entity_1.CoachClient)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

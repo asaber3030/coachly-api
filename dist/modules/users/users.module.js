@@ -9,23 +9,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const users_service_1 = require("./users.service");
-const users_controller_1 = require("./users.controller");
+const coach_client_entity_1 = require("../../common/entities/coach-client.entity");
 const user_entity_1 = require("../../common/entities/user.entity");
 const user_profile_entity_1 = require("../../common/entities/user-profile.entity");
+const roles_guard_1 = require("../../common/guards/roles.guard");
+const users_controller_1 = require("./users.controller");
+const users_service_1 = require("./users.service");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            typeorm_1.TypeOrmModule.forFeature([
-                user_entity_1.User,
-                user_profile_entity_1.UserProfile
-            ])
-        ],
+        imports: [typeorm_1.TypeOrmModule.forFeature([user_entity_1.User, user_profile_entity_1.UserProfile, coach_client_entity_1.CoachClient])],
         controllers: [users_controller_1.UsersController],
-        providers: [users_service_1.UsersService],
+        providers: [users_service_1.UsersService, roles_guard_1.RolesGuard],
         exports: [users_service_1.UsersService],
     })
 ], UsersModule);
