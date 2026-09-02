@@ -19,6 +19,7 @@ import { ProgressPhotosModule } from './modules/progress-photos/progress-photos.
 import { RecipesModule } from './modules/recipes/recipes.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkoutsModule } from './modules/workouts/workouts.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -43,10 +44,11 @@ import { WorkoutsModule } from './modules/workouts/workouts.module';
     }),
 
     DatabaseModule,
-    //MongoDbModule,
+    MongoDbModule,
     //RedisModule,
 
     AuthModule,
+    ChatModule,
     UsersModule,
     CoachModule,
     ExercisesModule,

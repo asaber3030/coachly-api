@@ -1,4 +1,5 @@
 export * from './auth/auth.module';
+export * from './chat/chat.module';
 export * from './coach/coach.module';
 export * from './diets/diets.module';
 export * from './exercises/exercises.module';
